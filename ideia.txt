@@ -1,0 +1,156 @@
+Fazer programa parser de horários do IFBA - através da planilha que a DE envia pra alguém do DAEEL e fica pelo WhatsApp no grupo de EIE.
+
+
+O programa tem que ser parecido com o do site da UFBA, que simula horários.
+
+>perguntar a meu amor como funciona
+
+
+————————
+
+
+Pensei no seguinte:
+
+1 - o usuário fornece a planilha ou eu já deixo parseado de alguma forma
+
+2 - o programa computa os horários e cria objetos, arrays ou dicts referente a cada disciplina (com seu código, nome, turma, professor…  e horário).
+
+3 - o horário eu vou ter que traduzir aqueles números escrotos pra dias da semana - slots dentro do dia - pre-configurar os horários de acordo com o salas.ifba.edu.br (ex: 17:00, 18:40. 20:20, 22:00)
+
+> ver txt salvo de um chat com Shai - 17nov2017
+
+0/1 - 13:20 as 15 h
+2/3 - 15:20 as 17 h
+4/5 - 17 as 18:40 h
+6/7 - 18:40 as 20:20 h
+8/9 - 20:20 h as 22 h
+10/11 - 7 as 8:40 h
+12/13 - 8:40 as 10:20 h
+14/15 - 10:40 h as 12:20 h
+
+
+
+4 - após isso: apresentar os dias da semana de segunda a sábado pro usuário e com os slots mostrando horários - em formato de tabela
+
+5 - a tabela será que nem o comprovante de matrícula, porém mais otimizado:
+
+> registrar só os horários de inicio das aulas… os horários finais de 12 e 22h servem para indicar fim das aulas…
+
+> pensei em colocar uma maneira de carregar um arquivo de txt, com dados de eventos e coisas que podem ocorrer numa semana de aula - pra ajudar a galera a manter o passo - apertando um botão pra carregar um calendário secundário
+
+
+	>> mas aí vai me lascar por que terei que criar um calendário interno com dia, mês e ano… e aqui eu só uso pra uma semana de aula por semestre
+
+> seria legal poder colorir o texto da janela do console, pra quem usar mac ou linux… windows não tá com nada!
+
+
+———————————
+
+	Dias
+
+Hor.	Seg	Ter	Qua	Qui	Sex	Sab
+
+07:00	x	x	x	x	x	QUI500
+
+08:40	x	x	x	x	x	QUI500
+	
+10:40	x	x	x	x	x	x	
+
+12:00	x	x	x	x	x	x
+
+13:20	x	x	x	x	x	x
+
+15:20	x	x	x	x	x	x
+
+17:00	HUM100
+
+18:40	MAT200		memes
+
+20:20		AFK	
+
+22:00
+
+
+———————
+
+E logo abaixo, uma lista das matérias que estão na tela, com organizadas por ordem alfabética (Código ou nome da disciplina+turma) [vagas também? acho melhor apertar tecla pra exibir ou ocultar] ou por ordem de horários - fazer switch com teclas
+
+HUM100 - Filosofia - T01 (Prof. Gracinha)
+MAT200 - Cálculo A. - T02 (Prof. Caribé)
+QUI500 - Química Geral e Tecnológica - T01 (Prof. Miguélito*)
+
+*entenderam a referência?
+
+
+————
+
+Beleza. Já sei como apresentar as informações… mas como adicionar as ditas disciplinas?
+
+Eu terei que coletar tudo da planilha, de acordo com a seguinte árvore:
+
++ disciplina
+	código
+	nome
+	turma
+	professor
+	horário
+	vagas
+
+
+E gerar uma lista de todos os códigos e turmas possíveis - fica mais fácil.
+
+Posso usar uma lista com sub-lista - tipo a do cfdisk (pra escolher formatos de sistema de arquivos)
+
+Aí a pessoa entra com o código e a turma… e a disciplina é alocada.
+
+————————
+
+Arrancando informações da planilha
+
+Coluna	A (ou 0) = Código da Disciplina XXX### 
+	- 3 letras em caixa-alta, seguidas de 3 números
+
+Coluna B (ou 1) = Nome da Disciplina - com caracteres especiais 
+	- tratar isso na hora de imprimir, somente
+
+Coluna C (ou 2) = Turma “T[01;02]”
+
+Coluna D;E (ou de 3 a 4) = SEG_INI; SEG_FIM  
+	- sim… a planilha registra os horários de início e de fim para cada disciplina, em cada dia da semana
+
+Coluna F;G (ou de 5 a 6)  = TER_INI; TER_FIM
+
+Coluna H;I (ou de 7 a 8)  = QUA_INI; QUA_FIM
+
+Coluna J;K (ou de 9 a 10)  = QUI_INI; QUI_FIM
+
+Coluna L;M (ou de 11 a 12)  = SEX_INI; SEX_FIM
+
+Coluna N;O (ou de 13 a 14)  = SAB_INI; SAB_FIM
+
+Colunas P a Z  (ou de 15 a 25)  significam o quê pra cada curso?
+	>créditos, carga horário, vagas?
+	>acho que vagas… MAT211 Calculo A T01 com Caribe tem 35 ELE, 10 MEC e 10 QUI
+
+	>EVE	MEC	ELE	ADM	POL	RAD	QUI	ADS	MAT	GEO	FIS
+	>Eventos, Mecânica, Engenharia Elétrica, Administração, Português e Linguagens, Radiologia, Química, Anál. & Dev. de Sist., Matemática, Geografia e Física.
+
+
+Coluna AA  (ou 27)  = nome do professor
+
+———————
+
+1 - ARRANCAR DADOS DA PLANILHA
+	> fácil, mas preciso tratar das bibliotecas que irei importar e como vou registrar os dados coletados - objetos, array, dicts - e como exportar - CSV, JSON, TXT bruto.
+	
+
+2 - RASCUNHAR INTERFACE GRAFICA
+	> quais dimensões eu precisarei invocar o console?
+	> usar espaço, ao invés de tabulação
+	> colocar teclas disponíveis no rodapé da telinha do console, estilo Vi e coisas do DOS
+	> dá pra usar n-curses multiplataforma?
+	> melhor eu usar npyscreen - começar desde já
+
+
+
+
