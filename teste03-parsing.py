@@ -1089,7 +1089,7 @@ def preLoadAll():
 	try:
 		print(5*" " + "Carregando arquivo YAML..." )
 		turmas_lista = yamlLoad(main_file)
-		print(5*" " + "Arquivo carregado com sucesso!" )
+		print(5*" " + "Arquivo carregado com sucesso! " )
 		
 		#print("[DEBUG]")
 		#print(turmas_lista)
@@ -1108,6 +1108,8 @@ def preLoadAll():
 
 
 def perguntarCurso():
+	global curso 		#retirar esse global depois, já que usarei o objeto
+	
 	curso = entrar("\n\n" + 10*" " + "Qual o seu curso? (ex: \"ELE\") --> ")
 	return curso
 	
