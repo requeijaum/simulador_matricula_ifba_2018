@@ -1,0 +1,15 @@
+!!python/object:__main__.Usuario
+curso: FIS
+cursos_lista:
+- EVE
+- MEC
+- ELE
+- ADM
+- POL
+- RAD
+- QUI
+- ADS
+- MAT
+- GEO
+- FIS
+name: Requinho

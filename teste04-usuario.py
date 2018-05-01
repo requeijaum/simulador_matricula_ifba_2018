@@ -58,6 +58,11 @@ stack_turmas = []
 menu = None
 curso = ""
 
+cursos = 0
+cursos_lista = []
+
+user = None
+
 #======================================================================
 # definir classes
 
@@ -148,7 +153,7 @@ class Menu:
 		self.sex = []
 		self.sab = []
 		
-		for i in range (0,9):
+		for i in range (0,9):			#pra quê eu fiz essa porção de código?
 			self.seg.append(5*" ")
 			self.ter.append(5*" ")
 			self.qua.append(5*" ")
@@ -158,7 +163,7 @@ class Menu:
 			
 			
 			
-class PersonalInfo :
+class Usuario :
 	"Um objeto necessário para eu gerir informações pessoais; \
 	salvar os cursos existentes na planilha... e talvez manipular como objeto depois!"
 	
@@ -168,9 +173,9 @@ class PersonalInfo :
 	def __init__(self, lista_cursos, meu_curso):
 		#vou receber um list com os cursos!
 		
-		self.lista_cursos		= lista_cursos
-		self.meu_curso			= meu_curso
-	
+		self.cursos_lista	= cursos_lista
+		self.curso			= curso
+		self.name 			= ""
 	
 	#def contador(self):			
 
@@ -451,6 +456,10 @@ def imprimirInfo():
 	#vars globais
 	global turmas
 	global turmas_lista
+	
+	global user
+	global cursos_lista
+	global cursos
 
 	# grab the active worksheet
 	ws = wb.active
@@ -500,6 +509,26 @@ def imprimirInfo():
 		# fazer a bagaça setar atributos junto com criacao das listas
 		# dentro de um loop, com verificador
 		#      setattr(Turma[i], 'seg', row[i].value) # Set attribute 'age' at 8
+		
+		
+		#=========================================
+		
+		#rotina para obter cursos
+		
+		#iterar rows correspondentes aos cursos
+		for row in ws.iter_rows(min_row=1, max_col=27, max_row=1): #max_row=(turmas+1)
+			for i in range(15,26):
+				cursos_lista.append(row[i].value)  #salvar a lista em global cursos_lista
+	
+		
+		#jogar lista pro objeto
+		user.cursos_lista = cursos_lista
+
+		print(user.cursos_lista)
+		
+		#salvar arquivo aux.yaml
+		yamlSave(user, aux_file)
+		
 		
 		
 		
@@ -557,8 +586,8 @@ def imprimirInfo():
 		#turmas_lista[0].JSON()
 		
 		#acho q preciso iterar a lista pra capturar todos os objetos... aff
-		yamlSave(None) #preciso zerar antes, né		
-		yamlSave(turmas_lista)
+		yamlSave(None, main_file) #preciso zerar antes, né		
+		yamlSave(turmas_lista, main_file)
 		
 	
 	else:
@@ -568,6 +597,9 @@ def imprimirInfo():
 	
 
 	#fim do verificador		
+	
+	
+	
 	
 
 def decodificaHorario(codigo):
@@ -786,11 +818,35 @@ def listarOpcoes():   #sdds manual de instruções dentro do programa
 	print(5*" " + "B = buscarTurma()")
 	print(5*" " + "P = buscarProfessor()")
 	print(5*" " + "H = buscarHorario()")
-	print(5*" " + "S = mostraStackTurmas")
+	print(5*" " + "S = mostraStackTurmas()")
+	print(5*" " + "U = criarUsuario()")
 	desenharLinha()
 	
 	entrar(3*" " + "Aperte qualquer tecla pra voltar...")
 
+
+
+
+# CRIAR FUNCAO PRA OBTER O INDICE DE DETERMINADO CURSO, NA PLANILHA
+# para limitar visualizações de turmas pelas vagas disponíveis pro curso do usuário
+
+# TO-DO: 
+# vou ter que incluir um if dentro de cada função de busca,
+# de acordo com o indice obtido por buscarVaga()
+
+def buscarVaga():
+
+	global curso
+	global cursos_lista
+	
+	# são 11 cursos atualmente
+	# planilha começa na row[15:26] --> cursos_lista[0:10]
+	
+	#iterar cursos_lista e obter o indice
+	
+
+	#retornar indice com offset
+	return indice+15  
 
 
 # SEMPRE DENTRO DOS MENUS DE BUSCA - POSSIBILITAR INCLUIR OU EXCLUIR UMA DISCIPLINA
@@ -1058,7 +1114,7 @@ def mostrarStackTurmas():
 	
 	
 
-def menuDebug():
+def debugMenu():
 	clear_screen()
 	print(nomeFuncaoAtual())
 	# debug necessário: 
@@ -1086,12 +1142,14 @@ def menuDebug():
 	
 def opcoesMenu():
 		
-		choice = entrar("\n     Selecione a opção desejada (I, M, B, P, H, L, S) --> ")
+		choice = entrar("\n     Selecione a opção desejada (I, M, B, P, H, L, S, U) --> ")
 	
 		#verificar se consigo importarPlanilha() e salvar objeto gigante em blob
 		#e importar o blob
 
-		if   choice == "i" or choice == "I":
+		choice = choice.upper()
+
+		if  choice == "I":
 				
 			if (importarPlanilha(selecionarPlanilha()) == True) :
 				mostrarSemana()
@@ -1101,35 +1159,39 @@ def opcoesMenu():
 				print("[DEBUG] importarPlanilha(selecionarPlanilha()) == False")
 				time.sleep(3)			
 			
-		elif choice == "m" or choice == "M":
+		elif choice == "M":
 			mostrarSemana()
 			opcoesMenu()
 			
 			
-		elif choice == "b" or choice == "B":
+		elif choice == "B":
 			buscarTurma()
 			
 			
-		elif choice == "p" or choice == "P":
+		elif choice == "P":
 			buscarProfessor()	
 		
 	
-		elif choice == "h" or choice == "H":
+		elif choice == "H":
 			buscarHorario()
 
 		
-		elif choice == "l" or choice == "L" or choice == "?":
+		elif choice == "L" or choice == "?":
 			listarOpcoes()
 
-		elif choice == "s" or choice == "S":
+		elif choice == "S":
 			mostrarStackTurmas()
 		
 			
 		#elif choice == "a" or choice == "A":
 		#	adicionarTurma()
 
-		elif choice == "d" or choice == "D":
-			menuDebug()
+		elif choice == "D":
+			debugMenu()
+	
+	
+		elif choice == "U":
+			criarUsuario()			
 
 
 
@@ -1137,9 +1199,15 @@ def preLoadAll():
 
 	global turmas
 	global turmas_lista
+	
+	
+	#adicionar cursos a partir da planilha
+	global user
+	global cursos
+	global cursos_lista
 
 	try:
-		print(5*" " + "Carregando arquivo YAML..." )
+		print(5*" " + "Carregando arquivo YAML com turmas...\n" )
 		turmas_lista = yamlLoad(main_file)
 		print(5*" " + "Arquivo carregado com sucesso! " )
 		
@@ -1150,34 +1218,126 @@ def preLoadAll():
 			turmas += 1
 			
 		#print(type(turmas))			
-		print(5*" " + "Encontram-se cadastradas " + str(turmas) + " turmas." )
+		print(5*" " + "Encontram-se cadastradas " + str(turmas) + " turmas.\n\n" )
 		
 	
 	except FileNotFoundError:
-		print(5*" " + "Arquivo " + file + " não encontrado.\n" + 5*" " + "Importe uma planilha para começar.")
+		print(5*" " + "Arquivo " + main_file + " não encontrado.\n" + 5*" " + "Importe uma planilha para começar.")
 	
+	
+	#adicionar rotina pra carregar perfil do usuario
 
+	try:
+		print(5*" " + "Carregando arquivo YAML com o perfil do usuário...\n" )
+		user = yamlLoad(aux_file)
+		print(5*" " + "Arquivo carregado com sucesso! " )
+		
+		#print("[DEBUG]")
+		#print(turmas_lista)
+		
+		
+		curso 			= user.curso
+		cursos_lista 	= user.cursos_lista	
+				
+		for c in cursos_lista:
+			cursos += 1
+				
+			
+		#print(type(turmas))			
+		print(5*" " + "Encontram-se cadastrados " + str(cursos) + " cursos.\n\n" )
+		
+	
+	except FileNotFoundError:
+		print(5*" " + "Arquivo " + aux_file + " não encontrado.\n" + 5*" " + "Importe uma planilha para começar.")
+	
 
 
 def perguntarCurso():
 	global curso 		#retirar esse global depois, já que usarei o objeto
 	
-	#.upper serve pra assegurar que curso será maiúsculo sempre, né
-	curso = entrar("\n\n" + 10*" " + "Qual o seu curso? (ex: \"ELE\") --> ")
-	curso = curso.upper()
 	
-	if testaStringCheia(curso, 1):  # se curso = "" --> False \ ou "  " (algo vazio)
-		print(5*" " + "\n[DEBUG] Seu curso \"" + curso + "\" foi computado.")
-		print(10*" " + "Isso pode reduzir conflitos entre horários.")
+	#testar e verificar qual curso foi precarregado
+	
+	if user == None:
+
+		#if user.curso == "":
+		if True: #desbugar rapidamente
+	
+			#.upper serve pra assegurar que curso será maiúsculo sempre, né
+			curso = entrar("\n\n" + 10*" " + "Qual o seu curso? (ex: \"ELE\") --> ")
+			curso = curso.upper()
+	
+			if testaStringCheia(curso, 1):  # se curso = "" --> False \ ou "  " (algo vazio)
+				print(5*" " + "\n[DEBUG] Seu curso \"" + curso + "\" foi computado.")
+				print(10*" " + "Isso pode reduzir conflitos entre horários.")
 		
-	else:
-		print(5*" " + "\n[DEBUG] Liberando informações para disciplinas de qualquer curso...")
-		print(10*" " + "Isso pode provocar mais conflitos entre horários.")
+			else:
+				print(5*" " + "\n[DEBUG] Liberando informações para disciplinas de qualquer curso...")
+				print(10*" " + "Isso pode provocar mais conflitos entre horários.")
+				time.sleep(3)
+	
+
+			return curso
+
+
+	else:	
+		curso = user.curso
+		
+		#imprimir lista de cursos carregadas
+		print(cursos_lista)
+		
+		#==========================================================
+		# iterar cursos_lista e validar o curso informado
+		
+		# mostrar erro caso o curso não exista!
+		
+		# --> return "" --> estou verificando bool(perguntarCurso())
+		#	return ""
+		#==========================================================
+		
+		print("\n\n")
+		print(5*" " + "[DEBUG] Seu curso é: " + curso)
+		print(5*" " + "[DEBUG] Seu nome  é: " + user.name)
+			
+		return curso
+		
+		
+		
+		
+		
+def criarUsuario():
+
+	global user
+	global cursos_lista
+	global curso
+		
+	# criar instancia da classe usuario
+	user = Usuario(cursos_lista, curso)
+
+	#capturar nome, né
+	user.name = entrar(5* " " + "Qual o seu nome?\n     --> ")
+	time.sleep(1)
+	
+	clear_screen()
+	print("[DEBUG] Usuario ...")
+	print(user.name)
+	print(user.curso)
+	print(cursos_lista)
+	
+	if cursos_lista == []:
+		print("\n\nA lista de cursos está vazia. Importe uma planilha AGORA!")
 		time.sleep(3)
+		
+		
+	
+	print("[DEBUG] Salvando arquivo com o perfil do usuário...")
+	yamlSave(user, aux_file)
 	
 	
-	return curso
-	
+	# criar função nos menus
+	# pra mudar nome de usuário e o curso - 
+
+
 
 # Definir função principal
 def main():
@@ -1197,7 +1357,11 @@ def main():
 		
 		while loop:
 			if bool(perguntarCurso()) :	#só liberar funcionalidade após informar o curso
-				flush_in()	
+				flush_in()
+				
+				if user == None:
+					criarUsuario()
+					
 				opcoesMenu()
  
   
