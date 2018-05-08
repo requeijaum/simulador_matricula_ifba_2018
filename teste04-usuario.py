@@ -42,9 +42,10 @@ if os.name == "nt":
 	print(locale.getpreferredencoding())
 	time.sleep(2)
 
-else:
-	print(locale.getpreferredencoding())
-	time.sleep(2)
+# Acho que o módulo locale é só pra Windows, heh
+#else:
+#	print(locale.getpreferredencoding())
+#	time.sleep(2)
 	
 #=================================================================
 
