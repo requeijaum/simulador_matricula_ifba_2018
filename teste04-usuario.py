@@ -361,6 +361,17 @@ def yamlSave(data, filename):
 def contains_word(string, word):
     return f' {word} ' in f' {string} '
 
+# https://www.dotnetperls.com/duplicates-python
+def remove_duplicates(values):
+    output = []
+    seen = set()
+    for value in values:
+        # If value has not been encountered yet,
+        # ... add it to both list and set.
+        if value not in seen:
+            output.append(value)
+            seen.add(value)
+    return output
 
 
 def testaStringCheia(string, modo):  # (string, 1) é meu preferido - modo 0 pode ajudar noutra coisa...
@@ -471,6 +482,7 @@ def sortCodigos(inicial):
 
 	elif isinstance(inicial, str):
 
+		
 		if len(inicial) == 3:
 
 			for turma in turmas_lista:
@@ -484,16 +496,37 @@ def sortCodigos(inicial):
 				if contains_word(turmas_lista[i].cod, inicial):
 					buscarTurma_lista.append(turmas_lista[i].numero)
 
-			#def mostrarPeloIndice(indice): - transformar esse pedaço em uma função auxiliar
+			if len(inicial) > 3:
+				#def mostrarPeloIndice(indice): - transformar esse pedaço em uma função auxiliar
 	
-			for i in range(0, (turmas-1)): 
-				for indice in buscarTurma_lista:
-					if indice == turmas_lista[i].numero :
-						print("\n" + 5*" "+ "Turma: #" + str(turmas_lista[i].numero) + " = " + turmas_lista[i].cod + ", " + turmas_lista[i].nome + " - "+ turmas_lista[i].nturma + "\n" + 20*" " + "(Prof. " + turmas_lista[i].nome_prof + ")")
+				for i in range(0, (turmas-1)): 
+					for indice in buscarTurma_lista:
+						if indice == turmas_lista[i].numero :
+							print("\n" + 5*" "+ "Turma: #" + str(turmas_lista[i].numero) + " = " + turmas_lista[i].cod + ", " + turmas_lista[i].nome + " - "+ turmas_lista[i].nturma + "\n" + 20*" " + "(Prof. " + turmas_lista[i].nome_prof + ")")
+	
+				# fim do tradutor de indice pra descricao util
 	
 	
-			# fim do tradutor de indice pra descricao util
-	
+			if len(inicial) < 4:
+			
+				#pegar a inicial de 3 digitos e buscar as que contem elas - append numa lista
+				#já fiz ali em cima no == 3
+				
+				#remover duplicados e sort na lista
+				buscarTurma_lista = remove_duplicates(buscarTurma_lista)
+				
+				#TRANSFORMAR INDICES EM CODIGOS
+				listinha = []
+				
+				for i in range(0, (turmas-1)): 
+					for indice in buscarTurma_lista:
+						if indice == turmas_lista[i].numero :
+							listinha.append(turmas_lista[i].cod)
+				
+				#imprimir lista de numeros possiveis pra inicial
+				print("\nNumeros possiveis para o codigo informado...")		
+				print(listinha)
+				
 			# mudar retorno depois	
 			#return t
 		
@@ -505,17 +538,6 @@ def sortCodigos(inicial):
 # fim das funcoes auxiliares
 
 
-# https://www.dotnetperls.com/duplicates-python
-def remove_duplicates(values):
-    output = []
-    seen = set()
-    for value in values:
-        # If value has not been encountered yet,
-        # ... add it to both list and set.
-        if value not in seen:
-            output.append(value)
-            seen.add(value)
-    return output
 
 
 
@@ -949,6 +971,10 @@ def buscarTurma():
 
 	query = entrar(5*" " + "Entre com o código da turma --> ").upper()
 	
+	#DEBUG pra codigo parcial
+	#print(len(query))
+	#time.sleep(2)
+	
 	#if not testaStringCheia(query, 0): #se a query for vazia?
 	#	return 0	
 		
@@ -968,16 +994,28 @@ def buscarTurma():
 				buscarTurma_lista.append(turmas_lista[i].numero)
 				
 		print(buscarTurma_lista)
-	
-	
-		#def mostrarPeloIndice(indice): - transformar esse pedaço em uma função auxiliar
-	
-		for i in range(0, (turmas-1)): 
-			for indice in buscarTurma_lista:
-				if indice == turmas_lista[i].numero :
-					print("\n" + 5*" "+ "Turma: #" + str(turmas_lista[i].numero) + " = " + turmas_lista[i].cod + ", " + turmas_lista[i].nome + " - "+ turmas_lista[i].nturma + "\n" + 20*" " + "(Prof. " + turmas_lista[i].nome_prof + ")")
 		
-		# fim do tradutor de indice pra descricao util
+		
+		
+		if len(query) > 3:
+		
+			#print("[DEBUG] len(query) > 3 !")
+			#time.sleep(2)
+			
+			#def mostrarPeloIndice(indice): 
+			#- transformar esse pedaço em uma função auxiliar
+			
+			for i in range(0, (turmas-1)): 
+				for indice in buscarTurma_lista:
+					if indice == turmas_lista[i].numero :
+						print("\n" + 5*" "+ "Turma: #" + str(turmas_lista[i].numero) + " = " + turmas_lista[i].cod + ", " + turmas_lista[i].nome + " - "+ turmas_lista[i].nturma + "\n" + 20*" " + "(Prof. " + turmas_lista[i].nome_prof + ")")
+		
+			# fim do tradutor de indice pra descricao util
+	
+		#else:
+		#	print("[DEBUG] len(query) < 3 !")
+		#	time.sleep(2)
+			
 	
 		# Transformar isso em função pras servir às outras funções de busca.
 		# Achei uma solução limpa pra query do usuário pra Adicionar ou Ver turma.
