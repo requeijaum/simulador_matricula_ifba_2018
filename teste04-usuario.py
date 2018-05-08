@@ -30,16 +30,22 @@ import os, sys, io, time, datetime, string
 
 print(os.name)
 
-import locale
+if os.name == "nt":
 
-#https://stackoverflow.com/questions/31469707/changing-the-locale-preferred-encoding-in-python-3-in-windows
-def getpreferredencoding(do_setlocale = True):
-    return "utf-8"
+	import locale
 
-locale.getpreferredencoding = getpreferredencoding
-print(locale.getpreferredencoding())
-time.sleep(2)
+	#https://stackoverflow.com/questions/31469707/changing-the-locale-preferred-encoding-in-python-3-in-windows
+	def getpreferredencoding(do_setlocale = True):
+		return "cp1252"
 
+	locale.getpreferredencoding = getpreferredencoding
+	print(locale.getpreferredencoding())
+	time.sleep(2)
+
+else:
+	print(locale.getpreferredencoding())
+	time.sleep(2)
+	
 #=================================================================
 
 from datetime import date
@@ -340,7 +346,7 @@ def yamlSave(data, filename):
 		encod = "utf8"
 		
 	else:
-		encod = "ascii"
+		encod = "cp1252"
 	
 	with io.open(filename, 'w', encoding=encod) as outfile:
 			yaml.dump(data, outfile, default_flow_style=False, allow_unicode=True)
@@ -942,8 +948,8 @@ def buscarTurma():
 
 	query = entrar(5*" " + "Entre com o código da turma --> ").upper()
 	
-	if not testaStringCheia(query, 0): #se a query for vazia?
-		return 0	
+	#if not testaStringCheia(query, 0): #se a query for vazia?
+	#	return 0	
 		
 	buscarCodigos(query)
 	
@@ -1059,8 +1065,8 @@ def buscarProfessor():
 	query = entrar(5*" " + "Entre com o nome ou sobrenome do professor --> ")
 	query = query.upper()
 	
-	if not testaStringCheia(query, 0): #se a query for vazia?
-		return 0	
+	#if not testaStringCheia(query, 0): #se a query for vazia?
+	#	return 0	
 		
 	buscarTurma_lista = []
 	
@@ -1145,8 +1151,8 @@ def buscarHorario():
 	#tentativa #1 - busca por horario	
 	query = entrar(5*" " + "Entre com o horário desejado (ex: \"18:40\") --> ")
 
-	if not testaStringCheia(query, 1): #se a query for vazia? --> modo 1 pra aceitar numeros e o dois-pontos
-		return 0
+	#if not testaStringCheia(query, 1): #se a query for vazia? --> modo 1 pra aceitar numeros e o dois-pontos
+	#	return 0
 	
 	for i in range(0, (turmas-1)):
 		#preciso que existam: horarios.seg até horarios.sab - criar atributos...
@@ -1234,8 +1240,8 @@ def buscarNomeTurma():
 	query = query.upper()
 	
 	
-	if not testaStringCheia(query, 0): #se a query for vazia?
-		return 0
+	#if not testaStringCheia(query, 0): #se a query for vazia?
+	#	return 0
 		
 	
 	buscarTurma_lista = []
@@ -1483,8 +1489,9 @@ def debugMenu():
 	
 	if choice == "00":
 		print("Seu sistema operacional é: " + os.name)
-		print(entrar("Digite qualquer coisa e eu irei repetir"))
-	
+		print(entrar("Digite qualquer coisa e eu irei repetir:\n     --> "))
+		time.sleep(2)
+		
 	if choice == "06":
 		print(5*" " + "buscarCodigos(query)")
 		
@@ -1671,7 +1678,11 @@ def perguntarCurso():
 	else:	
 		curso = user.curso
 		
-		#imprimir lista de cursos carregadas
+		# imprimir lista de cursos carregadas
+		
+		# TALVEZ LIMITAR ISSO E SÓ MOSTRAR NO INÍCIO DO PROGRAMA
+		# usar flag?
+		print("\n\n[DEBUG] Imprimir lista de cursos...")
 		print(cursos_lista)
 		
 		#==========================================================
