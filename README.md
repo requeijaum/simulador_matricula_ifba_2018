@@ -7,7 +7,9 @@ Rascunho (spaghetti 🍝) de um programa para facilitar a escolha de disciplinas
 video: https://www.youtube.com/watch?v=JqUS3DF3SNw
 
 # Instalação das bibliotecas necessárias
-``` pip install -r requirements.txt ```
+``` python -m pip install -r requirements.txt ```
+
+
 
 
 # AVISO LEGAL

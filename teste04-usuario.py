@@ -1454,6 +1454,7 @@ def verTurma(indice):
 		#tentar capturar horários
 		print(5*" "+ "Horários:")
 		print(turmas_lista[i].horarios_obj())
+		print(turmas_lista[i].vagas_obj())
 		print("\n\n")
 
 	time.sleep(3)
