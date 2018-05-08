@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: <UTF-8> -*-
+﻿#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Usar Python3
 
@@ -14,11 +14,39 @@
 
 # Importar bibliotecas de sempre
 import os, sys, io, time, datetime, string
+
+#=================================================================
+
+# override necessário... para multiplataforma!
+#sys.setdefaultencoding('utf-8')
+
+
+# TRETAS com W10
+
+#https://github.com/pypa/pip/issues/4251
+#https://stackoverflow.com/questions/23743160/locale-getpreferredencoding-why-does-this-reset-string-letters
+
+# FIX
+
+print(os.name)
+
+import locale
+
+#https://stackoverflow.com/questions/31469707/changing-the-locale-preferred-encoding-in-python-3-in-windows
+def getpreferredencoding(do_setlocale = True):
+    return "utf-8"
+
+locale.getpreferredencoding = getpreferredencoding
+print(locale.getpreferredencoding())
+time.sleep(2)
+
+#=================================================================
+
 from datetime import date
 
 # Usar interface gráfica com npyscreen
 # > http://npyscreen.readthedocs.io/application-structure.html
-import npyscreen
+#import npyscreen
 
 # Importar dados da planilha com OpenPyXL
 import openpyxl
@@ -35,14 +63,32 @@ import inspect
 # https://stackoverflow.com/questions/1773805/how-can-i-parse-a-yaml-file-in-python
 import yaml
 
+# Corrigir bug no Windows 10
+# https://stackoverflow.com/questions/2890146/how-to-force-pyyaml-to-load-strings-as-unicode-objects
+
+#from yaml import Loader, SafeLoader
+#
+#def construct_yaml_str(self, node):
+#    # Override the default string handling function 
+#    # to always return unicode objects
+#    return self.construct_scalar(node)
+	
+#Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+#SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+
 global main_file
 global aux_file
 
-main_file = "db.yaml"	# usar isso pra salvar e carregar turmas
-aux_file  = "aux.yaml"  # usar isso pra salvar e carregar cursos, mas futuramente: usar pra horarios e etc.
+#main_file = "db.yaml"	# usar isso pra salvar e carregar turmas
+#aux_file  = "aux.yaml"  # usar isso pra salvar e carregar cursos, mas futuramente: usar pra horarios e etc.
 
+#OSError: [Errno 22] Invalid argument: '.\x07ux.yaml'
 
+main_file = ascii("db.yaml" 	if os.name=='nt' else "db.yaml" )
+aux_file  = ascii("aux.yaml" 	if os.name=='nt' else "aux.yaml" )
 
+#print(main_file)
+#print(aux_file)
 
 
 # GLOBAL AQUI <-----------------------------------
@@ -281,15 +327,26 @@ def yamlLoad(filename):
 	# Read YAML file
 	with open(filename, 'r') as stream:
 		data_loaded = yaml.load(stream)
-		
+	
 	return data_loaded
 
 
 def yamlSave(data, filename):
-	# Write YAML file
-	with io.open(filename, 'w', encoding='utf8') as outfile:
-		yaml.dump(data, outfile, default_flow_style=False, allow_unicode=True)
 
+	encod = ""
+	
+	# Write YAML file
+	if os.name != "nt":
+		encod = "utf8"
+		
+	else:
+		encod = "ascii"
+	
+	with io.open(filename, 'w', encoding=encod) as outfile:
+			yaml.dump(data, outfile, default_flow_style=False, allow_unicode=True)
+
+	print("[DEBUG] yamlSave com encoding: " + encod)
+	
 # fim das funções de persistencia dos dados
 
 
@@ -1413,6 +1470,7 @@ def debugMenu():
 	
 	#transformar cada linha em print() depois
 	
+	print("00 - testar plataforma")
 	print("01 - arquivo YAML - forçar leitura e escrita")
 	print("02 - DUMP - de turmas, seletivo - por numero")
 	print("03 - DUMP - de numero de turmas cadastradas")
@@ -1423,13 +1481,15 @@ def debugMenu():
 	choice = entrar("\n" + 3*" " + "Selecione sua opção --> ")
 	
 	
+	if choice == "00":
+		print("Seu sistema operacional é: " + os.name)
+		print(entrar("Digite qualquer coisa e eu irei repetir"))
+	
 	if choice == "06":
 		print(5*" " + "buscarCodigos(query)")
 		
 		query = entrar(5*" " + "Digite iniciais ou nada --> ")
 		print(buscarCodigos(query))
-	
-	
 	
 	
 def opcoesMenu():

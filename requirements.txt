@@ -2,4 +2,4 @@ datetime
 npyscreen
 openpyxl
 simplejson
-yaml
+pyyaml
