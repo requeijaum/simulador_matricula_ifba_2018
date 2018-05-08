@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: <UTF-8> -*-
 
 # Usar Python3
-#coding: "utf-8"
+
 
 #
 #
@@ -102,16 +103,16 @@ class Turma:
 	
 	
 	def horarios_obj(self):
-		print("[DEBUG] self.horario_cod = ")
-		print(self.horario_cod)
+		#print("[DEBUG] self.horario_cod = ")
+		#print(self.horario_cod)
 		
 		obj = { "seg": self.horario_cod[0], "ter": self.horario_cod[2], "qua": self.horario_cod[4], "qui": self.horario_cod[6], "sex": self.horario_cod[8], "sab": self.horario_cod[10] }
 		return obj
 		
 		
 	def vagas_obj(self):
-		print("[DEBUG] self.vagas = ")
-		print(self.vagas)
+		#print("[DEBUG] self.vagas = ")
+		#print(self.vagas)
 		
 		obj = {"EVE": self.vagas[0], "MEC": self.vagas[1], "ELE": self.vagas[2], "ADM": self.vagas[3], "POL": self.vagas[4], "RAD": self.vagas[5], "QUI": self.vagas[6], "ADS": self.vagas[7], "MAT": self.vagas[8], "GEO": self.vagas[9], "FIS": self.vagas[10]}
 		return obj
@@ -176,6 +177,7 @@ class Usuario :
 		self.cursos_lista	= cursos_lista
 		self.curso			= curso
 		self.name 			= ""
+		self.stack_turmas   = []
 	
 	#def contador(self):			
 
@@ -297,7 +299,7 @@ def contains_word(string, word):
 
 
 
-def testaStringCheia(string, modo):  # (string, 1) é meu preferido
+def testaStringCheia(string, modo):  # (string, 1) é meu preferido - modo 0 pode ajudar noutra coisa...
 	
 	teste = None
 	lista_teste = []
@@ -397,7 +399,10 @@ def sortCodigos(inicial):
 		#for i in range(0,len(iniciais)):
 		#	print(3*" " + iniciais[i])		#como imprimir na mesma linha?
 		print(iniciais)
+		print("\n\n")
+		time.sleep(3)
 		#return iniciais
+		
 
 
 	elif isinstance(inicial, str):
@@ -818,7 +823,9 @@ def listarOpcoes():   #sdds manual de instruções dentro do programa
 	print(5*" " + "B = buscarTurma()")
 	print(5*" " + "P = buscarProfessor()")
 	print(5*" " + "H = buscarHorario()")
+	print(5*" " + "N = buscarNomeTurma()")
 	print(5*" " + "S = mostraStackTurmas()")
+	print(5*" " + "V = verTurma()")
 	print(5*" " + "U = criarUsuario()")
 	desenharLinha()
 	
@@ -834,19 +841,37 @@ def listarOpcoes():   #sdds manual de instruções dentro do programa
 # vou ter que incluir um if dentro de cada função de busca,
 # de acordo com o indice obtido por buscarVaga()
 
-def buscarVaga():
+def buscarVaga(): 	# Por enquanto...  essa é a única função que permite matrícula...
+
 
 	global curso
 	global cursos_lista
 	
 	# são 11 cursos atualmente
 	# planilha começa na row[15:26] --> cursos_lista[0:10]
-	
+	i = 0
+	indice = 0
+		
 	#iterar cursos_lista e obter o indice
-	
+	for c in cursos_lista :
+		#print(c)
+		i = i+1  #antes ou depois do if?
+		#print(i)
+		if curso == c :
+			indice = i
+			break
+			
+		#como lidar com curso não encontrado?	
+		if curso != c and i == len(cursos_lista):
+			print(5*" " + "[DEBUG] Curso não encontrado na planilha.")
+			return 0
+			
+		
+	#retornar indice com offset - de P:Z , na planilha
+	indice = indice+15
+	print(5*" " + "[DEBUG] Curso encontrado na planilha!")
+	return indice
 
-	#retornar indice com offset
-	return indice+15  
 
 
 # SEMPRE DENTRO DOS MENUS DE BUSCA - POSSIBILITAR INCLUIR OU EXCLUIR UMA DISCIPLINA
@@ -860,6 +885,9 @@ def buscarTurma():
 
 	query = entrar(5*" " + "Entre com o código da turma --> ").upper()
 	
+	if not testaStringCheia(query, 0): #se a query for vazia?
+		return 0	
+		
 	buscarCodigos(query)
 	
 	
@@ -887,14 +915,73 @@ def buscarTurma():
 		
 		# fim do tradutor de indice pra descricao util
 	
+		# Transformar isso em função pras servir às outras funções de busca.
+		# Achei uma solução limpa pra query do usuário pra Adicionar ou Ver turma.
 	
 		if buscarTurma_lista != []: 		
-			choice = entrar("\n\n" + 5*" " + "Pressione (A)dicionar uma turma; ou qualquer tecla para voltar.\n" + 5*" " + "--> ")
+			choice = entrar("\n\n" + 5*" " + "Pressione (A)dicionar uma turma; (V)er informações sobre uma turma; ou qualquer tecla para voltar.\n" + 5*" " + "--> ").upper()
+			
 	
-			if choice == "a" or choice == "A":
-				escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: " + str(buscarTurma_lista[0]) + ")\n" + 15*" " + "--> ")
-				adicionarTurma(escolher)
-
+			if choice == "A":
+				#escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: " + str(buscarTurma_lista[0]) + ")\n" + 15*" " + "--> ")
+				#adicionarTurma(escolher)
+	
+				escolher = None	
+			
+				while not isinstance(escolher, int):
+					
+					try:
+						escolher = int(escolher)
+					
+					except:
+						print("")
+						#print("[DEBUG] int(escolher) FALHOU")
+					
+					#print("[DEBUG] isinstance(escolher, int) ")
+					#print(isinstance(escolher, int))
+				
+					if isinstance(escolher, int):
+						adicionarTurma(escolher)
+					
+					else:
+								# pedir pra entrar de novo ou simplesmente avisar o erro e sair desse menu?
+								escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: " + str(buscarTurma_lista[0]) + ")\n" + 15*" " + "--> ")
+								
+								if isinstance(escolher, int):
+									break
+				
+				
+			if choice == "V":
+			
+				# AQUI PODE BUGAR SE A PESSOA NÃO ENTRAR COM UM NÚMERO
+			
+				#escolher = int(entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> "))
+				#verTurma(escolher)
+				escolher = None
+				
+				#escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> ")
+				
+			
+				while not isinstance(escolher, int):
+					
+					try:
+						escolher = int(escolher)
+					
+					except:
+						print("")
+						#print("[DEBUG] int(escolher) FALHOU")
+					
+					#print("[DEBUG] isinstance(escolher, int) ")
+					#print(isinstance(escolher, int))
+				
+					if isinstance(escolher, int):
+						verTurma(escolher)
+					
+					else:
+								# pedir pra entrar de novo ou simplesmente avisar o erro e sair desse menu?
+								escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> ")
+								if isinstance(escolher, int):
+									break
 	
 	return 0
 	
@@ -915,6 +1002,9 @@ def buscarProfessor():
 	query = entrar(5*" " + "Entre com o nome ou sobrenome do professor --> ")
 	query = query.upper()
 	
+	if not testaStringCheia(query, 0): #se a query for vazia?
+		return 0	
+		
 	buscarTurma_lista = []
 	
 	#a = int(str(turmas))
@@ -947,14 +1037,17 @@ def buscarProfessor():
 	
 	# fim do tradutor de indice pra descricao util
 	
-	
+	'''
 	if buscarTurma_lista != []: 		
-		choice = entrar("\n\n" + 5*" " + "Pressione (A)dicionar uma turma; ou qualquer tecla para voltar.\n" + 5*" " + "--> ")
+		choice = entrar("\n\n" + 5*" " + "Pressione (A)dicionar uma turma; (V)er informações sobre uma turma; ou qualquer tecla para voltar.\n" + 5*" " + "--> ").upper()
 	
-		if choice == "a" or choice == "A":
+		if choice == "A":
 			escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: " + str(buscarTurma_lista[0]) + ")\n" + 15*" " + "--> ")
 			adicionarTurma(escolher)
 
+		if choice == "V":
+				escolher = int(entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> "))
+				verTurma(escolher)
 	
 		#for i in range(0, len(buscarTurma_lista)-1): 
 		#	if numero in buscarTurma_lista[i]
@@ -962,6 +1055,8 @@ def buscarProfessor():
 	
 		# se choice for numero: perguntar se n quer adicionar uma turma? aperte A.
 		#elif choice
+	
+	'''
 	
 	return 0
 	
@@ -992,7 +1087,9 @@ def buscarHorario():
 	
 	#tentativa #1 - busca por horario	
 	query = entrar(5*" " + "Entre com o horário desejado (ex: \"18:40\") --> ")
-	
+
+	if not testaStringCheia(query, 1): #se a query for vazia? --> modo 1 pra aceitar numeros e o dois-pontos
+		return 0
 	
 	for i in range(0, (turmas-1)):
 		#preciso que existam: horarios.seg até horarios.sab - criar atributos...
@@ -1039,14 +1136,94 @@ def buscarHorario():
 	
 	# fim do tradutor de indice pra descricao util
 	
-	
+	'''
 	if buscarTurma_lista != []: 		
-		choice = entrar("\n\n" + 5*" " + "Pressione (A)dicionar uma turma; ou qualquer tecla para voltar.\n" + 5*" " + "--> ")
+		choice = entrar("\n\n" + 5*" " + "Pressione (A)dicionar uma turma; (V)er informações sobre uma turma; ou qualquer tecla para voltar.\n" + 5*" " + "--> ").upper()
 	
-		if choice == "a" or choice == "A":
+		if choice == "A":
 			escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: " + str(buscarTurma_lista[0]) + ")\n" + 15*" " + "--> ")
 			adicionarTurma(escolher)
 
+		if choice == "V":
+				escolher = int(entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> "))
+				verTurma(escolher)
+				
+		#for i in range(0, len(buscarTurma_lista)-1): 
+		#	if numero in buscarTurma_lista[i]
+		#		print("")
+	
+		# se choice for numero: perguntar se n quer adicionar uma turma? aperte A.
+		#elif choice
+	'''
+
+
+	
+	return 0
+
+
+def buscarNomeTurma():
+
+
+	clear_screen()
+	print(nomeFuncaoAtual())
+	
+	global turmas
+	global turmas_lista
+	
+	#print("[DEBUG]")
+	#print(turmas_lista)
+	
+	query = entrar(5*" " + "Entre com o nome da turma --> ")
+	query = query.upper()
+	
+	
+	if not testaStringCheia(query, 0): #se a query for vazia?
+		return 0
+		
+	
+	buscarTurma_lista = []
+	
+	#a = int(str(turmas))
+	#print(a)
+	
+	for i in range(0, (turmas-1)): 
+		#if contains_word(turmas_lista[i].nome, query):
+		
+		#talvez fazer tratamento pra nomes com acento?
+		#por enquanto vou só deixar em maiúsculo forçado
+		
+		#caso não encontre o nome... por causa de acento
+		#AttributeError: 'NoneType' object has no attribute 'upper'
+		#adicionei esse if... acho que não tô trabalhando com Data Type corretamente
+		
+		if turmas_lista[i].nome != None :		
+			if contains_word(turmas_lista[i].nome.upper(), query):
+				buscarTurma_lista.append(turmas_lista[i].numero)
+				
+	#print(buscarTurma_lista)
+	
+	
+	#def mostrarPeloIndice(indice): - transformar esse pedaço em uma função auxiliar
+	
+	for i in range(0, (turmas-1)): 
+		for indice in buscarTurma_lista:
+			if indice == turmas_lista[i].numero :
+				print("\n" + 5*" "+ "Turma: #" + str(turmas_lista[i].numero) + " = " + turmas_lista[i].cod + ", " + turmas_lista[i].nome + " - "+ turmas_lista[i].nturma + "\n" + 20*" " + "(Prof. " + turmas_lista[i].nome_prof + ")")
+	
+	
+	# fim do tradutor de indice pra descricao util
+	
+	'''
+	if buscarTurma_lista != []: 		
+		choice = entrar("\n\n" + 5*" " + "Pressione (A)dicionar uma turma; (V)er informações sobre uma turma; ou qualquer tecla para voltar.\n" + 5*" " + "--> ").upper()
+	
+		if choice == "A":
+			escolher = entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: " + str(buscarTurma_lista[0]) + ")\n" + 15*" " + "--> ")
+			adicionarTurma(escolher)
+
+		if choice == "V":
+				escolher = int(entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> "))
+				verTurma(escolher)
 	
 		#for i in range(0, len(buscarTurma_lista)-1): 
 		#	if numero in buscarTurma_lista[i]
@@ -1054,35 +1231,135 @@ def buscarHorario():
 	
 		# se choice for numero: perguntar se n quer adicionar uma turma? aperte A.
 		#elif choice
-
-
-
+		
+	'''
 	
 	return 0
+	
 
 
 
 def adicionarTurma(indice):
 	#print(nomeFuncaoAtual())
+	global turmas_lista
 	global stack_turmas
+	global user
 	
 	#adicionar turma por indice, quando estiver dentro de uma função de busca
 		
 	indice = int(indice) - 1  #pq o Turma.numero começa em 1, não em 0, como num List
 	
 	
-	# limitar o stack, de acordo com o número de disciplinas mínimas e máximas 
-	# a serem cursada
-	# reler as "Normas do Ensino Superior.pdf"
+	if indice not in range(indice , (len(turmas_lista)-1)):
+		print(i)
+		print(len(turmas_lista))
+		print("[DEBUG] indice fora do alcance da lista")
 	
-	stack_turmas.append(turmas_lista[indice].numero)
-	print(10*" " + "Turma adicionada com sucesso!")
+	else: 
+		# limitar o stack, de acordo com o número de disciplinas mínimas e máximas 
+		# a serem cursada
+		# reler as "Normas do Ensino Superior.pdf"
+	
+		stack_turmas.append(turmas_lista[indice].numero)
+		print(10*" " + "Turma adicionada com sucesso!")
+
+		
+		# antes de salvar... iterar a lista e verificar duplicatas
+		stack_turmas = remove_duplicates(stack_turmas)
+
+		
+		# ATRIBUIR E SALVAR NO ARQUIVO!
+		user.stack_turmas = stack_turmas
+		yamlSave(user, aux_file)
+		print(5*" " + "Arquivo " + aux_file + " salvo! Verifique suas turmas matriculadas.")
+
 	time.sleep(1)
 	
 	
 	
 	return 0
 
+
+
+def removerTurma(numero):
+	#print(nomeFuncaoAtual())
+	global turmas_lista
+	global stack_turmas
+	global user
+	
+	#remover turma por numero, quando estiver dentro de uma função de busca
+		
+	numero = int(numero)
+	
+	
+	if numero not in range(numero , len(turmas_lista) ): #não é indice... é o numero de 1 a len(turmas_lista)
+		print(numero)
+		print(len(turmas_lista)-1)
+		print("[DEBUG] numero fora do alcance da lista")
+	
+	else: 
+		# REMOVER TURMA
+	
+		stack_turmas.remove(numero)
+		print(10*" " + "Turma removida com sucesso!")
+
+		
+		# antes de salvar... iterar a lista e verificar duplicatas
+		stack_turmas = remove_duplicates(stack_turmas)
+
+		
+		# ATRIBUIR E SALVAR NO ARQUIVO!
+		user.stack_turmas = stack_turmas
+		yamlSave(user, aux_file)
+		print(5*" " + "Arquivo " + aux_file + " salvo! Verifique suas turmas matriculadas.")
+
+	time.sleep(1)
+	
+		
+
+
+
+	
+
+def verTurma(indice):
+
+	global turmas_lista
+	
+	#clear_screen()
+	#print(nomeFuncaoAtual())
+	
+	#entrar com indice da turma, diretamente na planilha
+	#permitir essa mostra de informações junto a adicionarTurma()
+	
+	
+	
+	i = 0
+	
+	# PRECISO DO OFFSET 1 pra iterar na lista
+	# verificar bug de offset de 2 unidades, ao entrar com indice...
+	# RESOLVIDO
+	i = int(indice) - 1
+	
+	if i not in range(i , (len(turmas_lista)-1)):
+		print(i)
+		print(len(turmas_lista))
+		print("[DEBUG] indice fora do alcance da lista")
+		
+	else:	
+	
+		print("\n" + 5*" "+ "Turma: #" + str(turmas_lista[i].numero) + " = " + turmas_lista[i].cod + ", " + turmas_lista[i].nome + " - "+ turmas_lista[i].nturma + "\n" + 20*" " + "(Prof. " + turmas_lista[i].nome_prof + ")")
+	
+		#tentar capturar horários
+		print(5*" "+ "Horários:")
+		print(turmas_lista[i].horarios_obj())
+		print("\n\n")
+
+	time.sleep(3)
+	
+	
+	
+	
+	
 
 def mostrarStackTurmas():
 	clear_screen()
@@ -1093,8 +1370,21 @@ def mostrarStackTurmas():
 
 	
 	global stack_turmas
+	
+	# ORGANIZAR ANTES DE MOSTRAR???
+	# acho que tanto faz... se eu chamei de stack... eu posso usar list.pop?
+	# stack_turmas = stack_turmas.sort()
+	
+	
 	print("\n" + "Lista de turmas adicionadas:\n" + 5*" ")
 	print(stack_turmas)
+	
+	print("\n")
+	time.sleep(1)
+	
+	for i in stack_turmas:
+		verTurma(i)
+		
 
 	# depois verificar cada turma
 	# limitar numero de caracteres do nome da disciplina e do prof?
@@ -1109,9 +1399,11 @@ def mostrarStackTurmas():
 	
 	
 	return 0
-	
 
-	
+
+
+
+
 	
 
 def debugMenu():
@@ -1141,57 +1433,80 @@ def debugMenu():
 	
 	
 def opcoesMenu():
-		
-		choice = entrar("\n     Selecione a opção desejada (I, M, B, P, H, L, S, U) --> ")
+
+	#tirar bug, algum dia
+	global curso
+
+
 	
-		#verificar se consigo importarPlanilha() e salvar objeto gigante em blob
-		#e importar o blob
+	choice = entrar("\n     Selecione a opção desejada (I, M, B, P, H, N, L, S, V, U) --> ")
 
-		choice = choice.upper()
+	#verificar se consigo importarPlanilha() e salvar objeto gigante em blob
+	#e importar o blob
 
-		if  choice == "I":
-				
-			if (importarPlanilha(selecionarPlanilha()) == True) :
-				mostrarSemana()
-				opcoesMenu()
-		
-			else:
-				print("[DEBUG] importarPlanilha(selecionarPlanilha()) == False")
-				time.sleep(3)			
+	choice = choice.upper()
+
+	if  choice == "I":
 			
-		elif choice == "M":
+		if (importarPlanilha(selecionarPlanilha()) == True) :
 			mostrarSemana()
 			opcoesMenu()
-			
-			
-		elif choice == "B":
-			buscarTurma()
-			
-			
-		elif choice == "P":
-			buscarProfessor()	
-		
 	
-		elif choice == "H":
-			buscarHorario()
-
+		else:
+			print("[DEBUG] importarPlanilha(selecionarPlanilha()) == False")
+			time.sleep(3)			
 		
-		elif choice == "L" or choice == "?":
-			listarOpcoes()
-
-		elif choice == "S":
-			mostrarStackTurmas()
+	elif choice == "M":
+		mostrarSemana()
+		opcoesMenu()
 		
-			
-		#elif choice == "a" or choice == "A":
-		#	adicionarTurma()
+		
+	elif choice == "B":
+		buscarTurma()
+		
+		
+	elif choice == "P":
+		buscarProfessor()	
+	
 
-		elif choice == "D":
-			debugMenu()
+	elif choice == "H":
+		buscarHorario()
+		
+		
+	elif choice == "N":
+		buscarNomeTurma()	
+
 	
+	elif choice == "L" or choice == "?":
+		listarOpcoes()
+
+	elif choice == "S":
+		mostrarStackTurmas()
+		escolher = entrar(5*" " + "(R)emover uma turma? Ou qualquer tecla para mostrar opções...").upper()
+		if escolher == "R":
+			removerTurma(int(entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> ")))
 	
-		elif choice == "U":
-			criarUsuario()			
+		
+	#elif choice == "A":
+	#	adicionarTurma()
+
+	elif choice == "D":
+		debugMenu()
+
+
+	elif choice == "U":
+		# algo meio bugado... 
+		#vou melhorar perguntar curso para ser mais fácil de mudar
+		# o nome e o curso do usuário já cadastrado
+		perguntarCurso()
+		curso = entrar(5*" " + "Qual é o seu curso? --> ").upper()
+		#fim da coisa bugada
+		
+		criarUsuario()			
+
+	elif choice == "V":
+		escolher = int(entrar(10*" " + "\nDigite o # (número) do índice da turma (exemplo: 333)\n" + 15*" " + "--> "))
+		verTurma(escolher)
 
 
 
@@ -1205,6 +1520,10 @@ def preLoadAll():
 	global user
 	global cursos
 	global cursos_lista
+	
+	# remover bug de mostraStackTurmas() resetando a stack a cada execução do programa
+	global stack_turmas
+	
 
 	try:
 		print(5*" " + "Carregando arquivo YAML com turmas...\n" )
@@ -1246,9 +1565,18 @@ def preLoadAll():
 		#print(type(turmas))			
 		print(5*" " + "Encontram-se cadastrados " + str(cursos) + " cursos.\n\n" )
 		
+		stack_turmas = user.stack_turmas
+		
+		#mostrar trabalho em progresso
+		print(5*" " + "Você está matriculado em " + str(len(stack_turmas)) + " turmas.\n\n" )
+		
+		
 	
 	except FileNotFoundError:
 		print(5*" " + "Arquivo " + aux_file + " não encontrado.\n" + 5*" " + "Importe uma planilha para começar.")
+	
+	
+	time.sleep(2)
 	
 
 
@@ -1310,7 +1638,7 @@ def criarUsuario():
 	global user
 	global cursos_lista
 	global curso
-		
+	
 	# criar instancia da classe usuario
 	user = Usuario(cursos_lista, curso)
 
@@ -1319,10 +1647,12 @@ def criarUsuario():
 	time.sleep(1)
 	
 	clear_screen()
-	print("[DEBUG] Usuario ...")
-	print(user.name)
-	print(user.curso)
+	#print("[DEBUG] Usuario ...")
+	#print(user.name)
+	#print(user.curso)
 	print(cursos_lista)
+	
+	
 	
 	if cursos_lista == []:
 		print("\n\nA lista de cursos está vazia. Importe uma planilha AGORA!")
@@ -1361,6 +1691,9 @@ def main():
 				
 				if user == None:
 					criarUsuario()
+				
+				#temporário
+				print(buscarVaga())
 					
 				opcoesMenu()
  

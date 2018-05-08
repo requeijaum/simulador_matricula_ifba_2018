@@ -1,5 +1,5 @@
 !!python/object:__main__.Usuario
-curso: FIS
+curso: ELE
 cursos_lista:
 - EVE
 - MEC
@@ -12,4 +12,8 @@ cursos_lista:
 - MAT
 - GEO
 - FIS
-name: Requinho
+name: RAFAEL FELIX SILVA REQUIÃO
+stack_turmas:
+- 395
+- 210
+- 207
